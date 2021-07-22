@@ -8,12 +8,12 @@ import url_builder
 import pathlib
 import requests
 import asyncio
+import url_aggregator
 
 def loadEndpointsList():
     with open('endpoints.txt') as f:
         endpoints = f.read().splitlines()
     return endpoints
-
 
 def scanEndpointsFromSwagger(urls, cPath):
     for indx in range(0, len(urls), 2):
@@ -21,7 +21,6 @@ def scanEndpointsFromSwagger(urls, cPath):
         req = hitEndpoint(url, urls[indx+1])
         checkHeaders(req, cPath)
         scanText(req, cPath)
-
         
 def createDisplayDirectory():
     from datetime import datetime
@@ -59,47 +58,6 @@ def createDisplayDirectory():
     return d
 
 
-def scanSwagger(url):
-    import json
-
-    if url[-1] == '/':
-        furl = url + 'api/swagger/v1/swagger.json'
-    else:
-        furl = url + '/api/swagger/v1/swagger.json'
-
-    req = hitEndpoint(furl, 'GET')
-
-    if req.status_code == 404:
-        return []
-
-    try:
-        data = json.loads(req.text)
-    except JSONDecodeError as e:
-        print('That request was not json I could decode, ensure this site has a swagger api')
-
-    p1 = ''
-
-    servers = data['servers']
-
-    for v in servers:
-        p1 = v['url']
-
-    urls = []
-
-    with open('endpoints.txt', 'r') as f:
-        endpoints = f.read().splitlines()
-        paths = data['paths']
-        for k, v in paths.items():
-            ep = '/api' + k
-            if ep not in endpoints:
-                with open('endpoints.txt', 'a') as file:
-                    file.write('\n' + p1 + k)
-                u = url + p1 + k
-                for m in v.keys():
-                    urls.append(u)
-                    urls.append(m.upper())
-    return urls
-
 def hitEndpoint(url, method):
     import requests
 
@@ -120,16 +78,10 @@ def hitEndpoint(url, method):
         return requests.head(url, headers=headers)
 
 def checkHeaders(req, cPath):
-    headers = req.headers
-
     new_display = str(cPath) + '\\display.html'
-
     d = pathlib.PureWindowsPath(new_display)
+    writeHeadersToDisplay(d, req)
 
-    with open(d, 'r') as f:
-        contents = f.read()
-
-    writeHeadersToDisplay(d, req.url, headers)
 
 def enumerateEndpoints(endpoints, url, cPath):
     for ep in endpoints:
@@ -185,7 +137,8 @@ def writeDataToDisplay(new_display, soup, url):
         tag.insert_before(title_soup)
         file.write(new_soup.prettify())
 
-def writeHeadersToDisplay(new_display, url, headers):
+
+def writeHeadersToDisplay(new_display, req):
     from pathlib import Path
 
     d = pathlib.PureWindowsPath(new_display)
@@ -205,23 +158,26 @@ def writeHeadersToDisplay(new_display, url, headers):
             new_soup = BeautifulSoup(content, 'html.parser')
             
     with open(d, 'w') as file:
-        title = f"<button class='accordion'>{url}</button><div class='panel'>"
+        title = f"<button class='accordion'>{req.url}</button><div class='panel'>"
         tag = new_soup.find(id="HeadersIn")
 
         nonos = {'role', 'password', 'token'}
         required_headers = {'X-XSS-Protection', 'Strict-Transport-Security', 'X-Frame-Options', 'X-Content-Type-Options', 'Content-Security-Policy', 'Referrer-Policy'}
 
         for no in nonos:
-            if no in headers:
+            if no in req.headers:
                 title += '<p>Value improperly included in headers: ' + no + '</p>'
         
         for rh in required_headers:
-            if rh not in headers:
+            if rh not in req.headers:
                 title += '<p>Missing required header: ' + rh + '</p>'
 
-        if 'X-XSS-Proctection' in headers and headers['X-XSS-Proctection'].find('1') != -1:
+        if 'X-XSS-Proctection' in req.headers and req.headers['X-XSS-Proctection'].find('1') != -1:
             title += '<p>Misconfigured X-XSS-Proctection Header</p><p>https://owasp.org/www-project-secure-headers/#x-xss-protection</p>'
 
+        if 'Allow' in req.headers:
+            title += '<h4>Allowed Methods</h4><br /><p>' + req.headers['Allow'] + '</p>'
+            
         title += '</div>'
         title_soup = BeautifulSoup(title, 'html.parser')
         tag.insert_before(title_soup)
@@ -273,7 +229,7 @@ def runScan():
 
     screenshot(url, cPath)
     enumerateEndpoints(endpoints, url, cPath)
-    urls = scanSwagger(url)
+    urls = url_aggregator.scanSwagger(url)
     scanEndpointsFromSwagger(urls, cPath)
     print('You will find results in a new folder one directory up.')
 
