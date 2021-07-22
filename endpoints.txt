@@ -1,0 +1,6 @@
+/api
+/admin
+/api/users
+/admin/users
+/admin/settings
+/api/System

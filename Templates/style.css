@@ -1,0 +1,62 @@
+body{
+	background: #FFFFFF;
+	margin: 0;
+	height: 100%;
+}
+
+.banner {
+	color: #1ee31e;
+	background-color: black;
+	height: 75px;
+	width: 100%
+	text-align: center;
+	font-size: 36px;	
+}
+
+accordion {
+	background-color: black;
+	color: whitesmoke;
+	cursor: pointer;
+	padding: 18px;
+	width: 100%;
+	border: none;
+	text-align: left;
+	outline: none;
+	font-size: 16px;
+	transition: 0.5s;
+}
+
+.accordion:hover {
+	background-color: #dbdbdb;
+	color: #1ee31e;
+}
+
+.active {
+	background-color: black;
+	color: #1ee31e;
+}
+
+.panel {
+	padding: 0 18px;
+	display: none;
+	background-color: white;
+	color: black;
+	overflow: hidden;
+	font-size: 14px;
+}
+
+.info {
+	bottom: 75px;
+	width: 100%;
+}
+
+footer {
+	text-align: center;
+	bottom: 0;
+	left: 0;
+	height: 75px;
+	width: 100%;
+	clear: both;
+	background-color: black;
+	color: #1ee31e;
+}
