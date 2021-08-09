@@ -32,7 +32,6 @@ def findVariablesInUrl(url):
 
 def isAlphaNum(s):
     p = re.complile('\w*', re.IGNORECASE)
-
     return p.match(s) != None
 
 

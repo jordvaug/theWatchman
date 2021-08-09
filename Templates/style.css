@@ -8,12 +8,12 @@ body{
 	color: #1ee31e;
 	background-color: black;
 	height: 75px;
-	width: 100%
+	width: 100%;
 	text-align: center;
 	font-size: 36px;	
 }
 
-accordion {
+.accordion {
 	background-color: black;
 	color: whitesmoke;
 	cursor: pointer;
@@ -28,7 +28,7 @@ accordion {
 
 .accordion:hover {
 	background-color: #dbdbdb;
-	color: #1ee31e;
+	color: black;
 }
 
 .active {
