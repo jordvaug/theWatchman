@@ -5,5 +5,3 @@
 /admin/settings
 /api/System
 /api/Authentication
-/api/Identity/Evaluate
-/api/Identity/Verify

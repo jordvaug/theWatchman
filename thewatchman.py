@@ -24,8 +24,8 @@ def scanEndpointsFromSwagger(urls, cPath):
     for indx in range(0, len(urls), 2):
         url = url_builder.urlParser(urls[indx])
         req = hitEndpoint(url, urls[indx+1])
-        checkHeaders(req, cPath)
         scanText(req, cPath)
+        checkHeaders(req, cPath)
         
 
 def hitEndpoint(url, method):

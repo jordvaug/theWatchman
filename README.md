@@ -1,5 +1,6 @@
 # theWatchman
-:snake:  Python Project used to scan web applications for security vulnerabilities.
+:snake:  Python Project used to scan web applications for security vulnerabilities, this tool is 
+designed to make people take security more seriously!
 
 ## Uses
 Currently designed for use on Windows OS to scan web applications for vulnerabilities. Uses nmap to find open ports and attempts to detect application

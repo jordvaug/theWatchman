@@ -127,8 +127,7 @@ def writeNmapScanToDisplay(new_display, nm):
         for host, value in scan:
             title = f"<h3>Host</h3><div><p>Host : {(value['hostnames'][0]['name'])}</p><br />"
             title += f"<br/><p>State: {value['status']['state']}</p>"
-            title += f"<hr><br/><h5>TCP Ports</h5>"
-            title += "<hr><br/>"
+            title += f"<hr><br/><h5>TCP Ports</h5><br/>"
             for port, v in value['tcp'].items():
                 title += f"<span> port:     {port}</span><br/><span>state:    {v['state']}</span><br/>"
                 title += "<hr><br/>"
