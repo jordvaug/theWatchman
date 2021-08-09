@@ -43,5 +43,3 @@ def scanHost(url):
     print('-----------------------------------------')
 
     return results
-
-#scanHost('https://www.vetexpeditions.com')
