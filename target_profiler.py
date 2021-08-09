@@ -7,10 +7,10 @@ def scanHost(url):
     print('Profile Target....')
 
     #prepare url for socket use
-    if re.search('https://', url, re.IGNORECASE):
-        url = url.replace("https://", "")
-    if re.search('http://', url, re.IGNORECASE):
-        url = url.replace("https://", "")
+    if re.search('https:', url, re.IGNORECASE):
+        url = url.replace("https:", "")
+    if re.search('http:', url, re.IGNORECASE):
+        url = url.replace("http:", "")
     if re.search('/', url, re.IGNORECASE):
         url = url.replace("/", "")
 
