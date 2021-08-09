@@ -3,7 +3,9 @@ from json.decoder import JSONDecodeError
 
 def scanSwagger(url, ssl):
     import json
-
+    
+    print('Searching for a swagger listing...')
+    print('-------------------------------------------------')
     if url[-1] == '/':
         url = url[0:-1]
 
@@ -27,6 +29,7 @@ def scanSwagger(url, ssl):
                     print('Giving up on finding swagger docs...')
                     return []
 
+    print('Possible Swagger doc found at: ' + req.url)
     try:
         data = json.loads(req.text)
     except JSONDecodeError as e:
@@ -40,7 +43,7 @@ def scanSwagger(url, ssl):
         p1 = v['url']
 
     urls = []
-
+    print('Saving Swagger Endpoints for future use.')
     with open('endpoints.txt', 'r') as f:
         endpoints = f.read().splitlines()
         paths = data['paths']
