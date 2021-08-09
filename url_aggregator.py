@@ -13,13 +13,16 @@ def scanSwagger(url):
 
     if req.status_code == 404 or req.status_code == 302:
         print('No swagger found at: ' + furl)
-        req = send(url + 'swagger/swagger.json')
+        print('Trying: '+ url + '/swagger/swagger.json')
+        req = send(url + '/swagger/swagger.json')
         if req.status_code == 404 or req.status_code == 302:
             print('No swagger found at: /swagger/swagger.json')
-            req = send(url + 'v1/swagger/swagger.json')
+            print('Trying: '+ url + '/v1/swagger/swagger.json')
+            req = send(url + '/v1/swagger/swagger.json')
             if req.status_code == 404 or req.status_code == 302:
                 print('No swagger found at: /v1/swagger/swagger.json')
-                req = send(url + 'swagger/docs/swagger.json')
+                print('Trying: '+ url + '/swagger/docs/swagger.json')
+                req = send(url + '/swagger/docs/swagger.json')
                 if req.status_code == 404 or req.status_code == 302:
                     print('Giving up on finding swagger docs...')
                     return []
@@ -28,7 +31,7 @@ def scanSwagger(url):
         data = json.loads(req.text)
     except JSONDecodeError as e:
         print('That request was not json I could decode, ensure this site has a swagger api')
-
+        return []
     p1 = ''
 
     servers = data['servers']
