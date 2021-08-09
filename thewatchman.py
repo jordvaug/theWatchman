@@ -68,35 +68,31 @@ def scanText(req, cPath):
 
     if req.text == None or req.status_code == None:
         print('No page found at: ' + req.url)
-        return
-
-    if req.status_code == 401 or req.status_code == 302 or req.status_code == 404:
-        print('No Page Found')
-        return
-
-    soup = BeautifulSoup(req.text, 'html.parser')
-    new_display = str(cPath) + '\\display.html'
-    d = pathlib.PureWindowsPath(new_display)
-
-    if soup.find('Unauthorized Access') or len(str(soup)) == 0:
-        print('No Page Found')
+    elif req.status_code == 401 or req.status_code == 302 or req.status_code == 404:
+        print('No Page Found at: ' + req.url)
     else:
-        report_builder.writeDataToDisplay(d, soup, req.url)
+        soup = BeautifulSoup(req.text, 'html.parser')
+        new_display = str(cPath) + '\\display.html'
+        d = pathlib.PureWindowsPath(new_display)
 
-        if soup.find_all('a') != None:
-            links = str(cPath) + '\\links.txt'
-            my_file = Path(str(links))
-            l = pathlib.PureWindowsPath(links)
-            if not my_file.is_file():
+        if soup.find('Unauthorized Access') or len(str(soup)) == 0:
+            print('No Page Found at: ' + req.url)
+        else:
+            report_builder.writeDataToDisplay(d, soup, req.url)
+
+            if soup.find_all('a') != None:
+                links = str(cPath) + '\\links.txt'
+                my_file = Path(str(links))
+                l = pathlib.PureWindowsPath(links)
+                if not my_file.is_file():
+                    with open(l, 'w') as f:
+                        f.write('Links Found:\n')
                 with open(l, 'w') as f:
-                    f.write('Links Found:\n')
-            d = pathlib.PureWindowsPath(new_display)
-            with open(l, 'w') as f:
-                f.write('\n*********************\n')
-                f.write('Links found from: ' + '\n' + req.url + '\n\n')
-                for link in soup.find_all('a'):
-                    f.write('\n')
-                    f.write(str(link.get('href')))
+                    f.write('\n*********************\n')
+                    f.write('Links found from: ' + '\n' + req.url + '\n\n')
+                    for link in soup.find_all('a'):
+                        f.write('\n')
+                        f.write(str(link.get('href')))
 
 
 async def loadJS(url, cPath):
@@ -109,6 +105,22 @@ async def loadJS(url, cPath):
     page = await browser.newPage()
     await page.goto(url)
     await page.screenshot({'path': img})
+    content = await page.evaluate('document.body', force_expr=True)
+    soup = BeautifulSoup(content, 'html.parser')
+    #look for login page from here?
+    if soup.find_all('a') != None:
+            links = str(cPath) + '\\links.txt'
+            my_file = Path(str(links))
+            l = pathlib.PureWindowsPath(links)
+            if not my_file.is_file():
+                with open(l, 'w') as f:
+                    f.write('Links Found:\n')
+            with open(l, 'w') as f:
+                f.write('\n*********************\n')
+                f.write('Links found from: ' + '\n' + url + '\n\n')
+                for link in soup.find_all('a'):
+                    f.write('\n')
+                    f.write(str(link.get('href')))
 
     await browser.close()
 
@@ -125,7 +137,6 @@ def runScan():
     print('                 TheWatchman                   ')
     print('===============================================')
 
-    #verify=False
     parser = OptionParser()
     parser.add_option("-q", "--quiet", action="store_false", dest="verbose", default=False, help="Silence command line output")
     parser.add_option("-H", "--Host",dest='url', type='string', help="Specify target Host")
@@ -193,6 +204,8 @@ def runScan():
     if quiet != None:
         sys.stdout = sys.__stdout__
 
+    print('----------------------------------------------------------------')
+    print('Success!')
     print('You will find results in a new folder one directory up.')
 
 

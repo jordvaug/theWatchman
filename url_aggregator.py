@@ -3,9 +3,9 @@ from json.decoder import JSONDecodeError
 
 def scanSwagger(url, ssl):
     import json
-    
-    print('Searching for a swagger listing...')
     print('-------------------------------------------------')
+    print('Searching for a swagger listing...')
+
     if url[-1] == '/':
         url = url[0:-1]
 
