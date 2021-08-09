@@ -65,13 +65,19 @@ def enumerateEndpoints(endpoints, url, cPath, ssl):
 
 
 def scanText(req, cPath):
+
+    if req.status_code == 401 or req.status_code == 302 or req.status_code == 404:
+        print('No Page Found')
+
+    if req.text == None:
+        print('No body found at: ' + req.url)
+        return
+
     soup = BeautifulSoup(req.text, 'html.parser')
     new_display = str(cPath) + '\\display.html'
     d = pathlib.PureWindowsPath(new_display)
 
     if soup.find('Unauthorized Access') or len(str(soup)) == 0:
-        print('No Page Found')
-    elif req.status_code == 401 or req.status_code == 302 or req.status_code == 404:
         print('No Page Found')
     else:
         report_builder.writeDataToDisplay(d, soup, req.url)
