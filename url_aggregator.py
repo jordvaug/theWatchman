@@ -1,7 +1,7 @@
 import requests
 from json.decoder import JSONDecodeError
 
-def scanSwagger(url):
+def scanSwagger(url, ssl):
     import json
 
     if url[-1] == '/':
@@ -9,20 +9,20 @@ def scanSwagger(url):
 
     furl = url + '/api/swagger/v1/swagger.json'
 
-    req = send(furl)
+    req = send(furl, ssl)
 
     if req.status_code == 404 or req.status_code == 302:
         print('No swagger found at: ' + furl)
         print('Trying: '+ url + '/swagger/swagger.json')
-        req = send(url + '/swagger/swagger.json')
+        req = send(url + '/swagger/swagger.json', ssl)
         if req.status_code == 404 or req.status_code == 302:
             print('No swagger found at: /swagger/swagger.json')
             print('Trying: '+ url + '/v1/swagger/swagger.json')
-            req = send(url + '/v1/swagger/swagger.json')
+            req = send(url + '/v1/swagger/swagger.json', ssl)
             if req.status_code == 404 or req.status_code == 302:
                 print('No swagger found at: /v1/swagger/swagger.json')
                 print('Trying: '+ url + '/swagger/docs/swagger.json')
-                req = send(url + '/swagger/docs/swagger.json')
+                req = send(url + '/swagger/docs/swagger.json', ssl)
                 if req.status_code == 404 or req.status_code == 302:
                     print('Giving up on finding swagger docs...')
                     return []
@@ -60,5 +60,5 @@ def scanSwagger(url):
 
 
 
-def send(url):
-    return requests.get(url, headers={'Content-Type': 'application/json'})
+def send(url, ssl):
+    return requests.get(url, headers={'Content-Type': 'application/json'}, verify= ssl)

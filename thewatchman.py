@@ -20,32 +20,32 @@ def loadEndpointsList():
         endpoints = f.read().splitlines()
     return endpoints
 
-def scanEndpointsFromSwagger(urls, cPath):
+def scanEndpointsFromSwagger(urls, cPath, ssl):
     for indx in range(0, len(urls), 2):
         url = url_builder.urlParser(urls[indx])
-        req = hitEndpoint(url, urls[indx+1])
+        req = hitEndpoint(url, urls[indx+1], ssl)
         scanText(req, cPath)
         checkHeaders(req, cPath)
         
 
-def hitEndpoint(url, method):
+def hitEndpoint(url, method, ssl):
     import requests
 
     data = {}
     headers = {'Content-Type': 'application/json'}
 
     if method == "GET":
-        return requests.get(url, headers=headers)
+        return requests.get(url, headers=headers, verify=ssl)
     elif method == 'POST':
-        return requests.post(url, headers=headers)
+        return requests.post(url, headers=headers, verify=ssl)
     elif method == "PUT":
-        return requests.put(url, headers=headers)
+        return requests.put(url, headers=headers, verify=ssl)
     elif method == 'DELETE':
-        return requests.get(url, headers=headers)
+        return requests.get(url, headers=headers, verify=ssl)
     elif method == 'OPTIONS':
-        return requests.options(url, headers=headers)
+        return requests.options(url, headers=headers, verify=ssl)
     elif method == "HEAD":
-        return requests.head(url, headers=headers)
+        return requests.head(url, headers=headers, verify=ssl)
 
 def checkHeaders(req, cPath):
     new_display = str(cPath) + '\\display.html'
@@ -53,13 +53,13 @@ def checkHeaders(req, cPath):
     report_builder.writeHeadersToDisplay(d, req)
 
 
-def enumerateEndpoints(endpoints, url, cPath):
+def enumerateEndpoints(endpoints, url, cPath, ssl):
     print('Enumerate endpoint list:')
     print()
     for ep in endpoints:
         furl = url + ep
         furl = url_builder.urlParser(furl)
-        req = requests.get(furl)
+        req = requests.get(furl, verify=ssl)
         scanText(req, cPath)
         checkHeaders(req, cPath)
 
@@ -118,11 +118,13 @@ def runScan():
     print('                 TheWatchman                   ')
     print('===============================================')
 
-    
+    #verify=False
     parser = OptionParser()
     parser.add_option("-q", "--quiet", action="store_false", dest="verbose", default=False, help="Silence command line output")
     parser.add_option("-H", "--Host",dest='url', type='string', help="Specify target Host")
     parser.add_option("-t", "--Type",dest='appType', type='string', help="Specify target Application type (options: dotnet, wp)")
+    parser.add_option("-s", "--SSL", dest='ssl', type='string' ,default=True, help="Specify whether to verify SSL certificates, default True")
+    parser.add_option("-c", "--Cert", dest='cert', type='string', help="Specify path to a root certificate")
     (options, args) = parser.parse_args()
 
     url = options.url
@@ -144,6 +146,17 @@ def runScan():
     if appType == None:
         print('No application type specified, trying to determine...')
 
+    ssl = options.ssl
+
+    if ssl == None or ssl == 'True' or ssl == "true":
+        ssl = True
+
+    cert = options.cert
+
+    if cert != None:
+        ssl = cert
+    
+
     while not validators.url(url):
         url = input('Try again, that was not a valid url: ')
 
@@ -151,7 +164,7 @@ def runScan():
         url = url[0:-1]
 
     try:
-        requests.get(url)
+        requests.get(url, verify= ssl)
     except requests.exceptions.RequestException as e:
         print('That url caused some problems, maybe it isn\'t valid?')
         raise SystemExit(e)
@@ -166,9 +179,9 @@ def runScan():
 
     screenshot(url, cPath)
 
-    enumerateEndpoints(endpoints, url, cPath)
-    urls = url_aggregator.scanSwagger(url)
-    scanEndpointsFromSwagger(urls, cPath)
+    enumerateEndpoints(endpoints, url, cPath, ssl)
+    urls = url_aggregator.scanSwagger(url, ssl)
+    scanEndpointsFromSwagger(urls, cPath, ssl)
 
     if quiet != None:
         sys.stdout = sys.__stdout__
@@ -177,14 +190,3 @@ def runScan():
 
 
 runScan()
-
-
-
-
-
-
-
-    
-
-    
-  
