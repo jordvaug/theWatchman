@@ -34,7 +34,7 @@ Command Line options:
   Only the Host option is required, if Type is not included then theWatchman will attempt to use nmap to uncover it. This will be noted in the report, and future releases will use this information for more targeted probing of the application.
 
   **SSL**
-  This option is useful when a self-signed certificates are used on a site, if you get an error like "CERTIFICATE_VERIFY_FAILED", you can set *-s* to False. The default value is True. You can also optionally set the -c value to the location of the root certificate that the site uses. For example if my site uses a self-signed cert and I encounter the cert verify failure, I can download the certificate from the browser and then feed theWatchman that path (eg: -c 'C:\Users\\*user*\Desktop\cert.pem'), in this case, it is unnecessary to adjust the -s option.
+  This option is useful when a self-signed certificates are used on a site, if you get an error like "CERTIFICATE_VERIFY_FAILED", you can set *-s* to False. The default value is True. You can also optionally set the -c value to the location of the root certificate that the site uses. For example if my site uses a self-signed cert and I encounter the cert verify failure, I can download the certificate from the browser, place it in theWatchman directory and feed theWatchman that path (eg: -c './cert.crt'), in this case, it is unnecessary to adjust the -s option.
   
   Adding more endpoints to the *endpoints.txt* file will cause theWatchman to scan them, follow the format of the current links to add more (eg /cdn-cgi/login)
                         
