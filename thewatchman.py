@@ -66,11 +66,12 @@ def enumerateEndpoints(endpoints, url, cPath, ssl):
 
 def scanText(req, cPath):
 
+    if req.text == None or req.status_code == None:
+        print('No page found at: ' + req.url)
+        return
+
     if req.status_code == 401 or req.status_code == 302 or req.status_code == 404:
         print('No Page Found')
-
-    if req.text == None:
-        print('No body found at: ' + req.url)
         return
 
     soup = BeautifulSoup(req.text, 'html.parser')
